@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How staticrypt Works — V/ENTER WEB</title>
+<meta name="description" content="staticryptが内部でやっていること。GitHub Pages + クライアント側JS復号の仕組みと、PW強度がそのまま暗号強度になる理由。">
+<link rel="canonical" href="https://enter-web.github.io/internal-shared/staticrypt-mechanism.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+JP:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/vaizo-editorial.css">
+<style>
+.top-nav {
+  position: sticky; top: 0; background: var(--paper-off-white);
+  border-bottom: 1px solid var(--rule-hairline); padding: 14px 0; z-index: 10;
+}
+.top-nav__inner {
+  max-width: var(--max-w-page); margin: 0 auto;
+  padding: 0 clamp(24px, 4vw, 48px);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.top-nav__brand {
+  font-family: var(--font-sans-en); font-size: 13px; letter-spacing: 0.08em;
+  color: var(--ink-black); text-decoration: none;
+}
+.top-nav__brand .slash { color: var(--accent-gold); }
+.top-nav__back {
+  font-family: var(--font-sans-en); font-size: 12px; letter-spacing: 0.12em;
+  color: var(--ink-graphite); text-decoration: none; text-transform: uppercase;
+}
+
+main { max-width: var(--max-w-page); margin: 0 auto; padding: 0 clamp(24px, 4vw, 48px); }
+
+/* Hero */
+.p-hero {
+  padding: clamp(48px, 9vw, 96px) 0 clamp(24px, 4vw, 40px);
+  border-bottom: 1px solid var(--rule-hairline);
+}
+.p-hero__eyebrow {
+  font-family: var(--font-sans-en); font-weight: 700; font-size: 11px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-grey); margin-bottom: 14px;
+}
+.p-hero__title {
+  font-family: var(--font-sans-en); font-weight: 900;
+  font-size: clamp(40px, 6vw, 80px); letter-spacing: 0.02em;
+  line-height: 1; margin: 0 0 16px;
+}
+.p-hero__title .accent { color: var(--accent-gold); }
+.p-hero__subtitle {
+  font-family: var(--font-sans-jp); font-weight: 700;
+  font-size: clamp(16px, 1.6vw, 20px);
+  color: var(--ink-charcoal); margin: 0 0 20px;
+}
+.p-hero__lead {
+  font-family: var(--font-sans-jp); font-size: 14px;
+  color: var(--ink-graphite); margin: 0;
+  max-width: 720px; line-height: 1.9;
+}
+.p-hero__meta {
+  margin-top: 20px; font-family: var(--font-sans-en);
+  font-size: 11px; letter-spacing: 0.1em;
+  color: var(--ink-soft); text-transform: uppercase;
+}
+
+/* TL;DR */
+.tldr {
+  padding: clamp(32px, 5vw, 56px) 0;
+  background: var(--paper-cream);
+  border-bottom: 3px solid var(--ink-black);
+  margin: 0 calc(50% - 50vw);
+}
+.tldr__inner {
+  max-width: var(--max-w-page); margin: 0 auto;
+  padding: 0 clamp(24px, 4vw, 48px);
+}
+.tldr__eyebrow {
+  font-family: var(--font-sans-en); font-weight: 900; font-size: 11px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent-gold); margin: 0 0 14px;
+}
+.tldr__heading {
+  font-family: var(--font-sans-jp); font-weight: 700;
+  font-size: clamp(20px, 2.4vw, 28px); line-height: 1.5;
+  color: var(--ink-black); margin: 0 0 16px;
+  letter-spacing: 0.01em;
+}
+.tldr__bullets {
+  list-style: none; padding: 0; margin: 0;
+  display: grid; gap: 10px;
+  font-family: var(--font-sans-jp); font-size: 14px;
+  color: var(--ink-charcoal); line-height: 1.85;
+}
+.tldr__bullets li {
+  padding-left: 28px; position: relative;
+}
+.tldr__bullets li::before {
+  content: '\2192'; position: absolute; left: 0; top: 0;
+  color: var(--accent-gold); font-family: var(--font-sans-en);
+  font-weight: 900; font-size: 18px; line-height: 1.4;
+}
+.tldr__bullets strong { color: var(--ink-black); font-weight: 700; }
+
+/* Section */
+.p-section {
+  padding: clamp(40px, 6vw, 64px) 0;
+  border-bottom: 1px solid var(--rule-hairline);
+  scroll-margin-top: 80px;
+}
+.p-section:last-of-type { border-bottom: none; }
+.p-section__num {
+  font-family: var(--font-sans-en); font-weight: 900; font-size: 11px;
+  letter-spacing: 0.16em; color: var(--accent-gold);
+  text-transform: uppercase; margin: 0 0 8px;
+}
+.p-section__title {
+  font-family: var(--font-sans-en); font-weight: 900;
+  font-size: clamp(24px, 3vw, 36px); letter-spacing: 0.02em;
+  line-height: 1.2; color: var(--ink-black); margin: 0 0 8px;
+}
+.p-section__title .jp {
+  font-family: var(--font-sans-jp); font-weight: 700; font-size: 14px;
+  color: var(--ink-grey); margin-left: 12px; letter-spacing: 0.04em;
+}
+.p-section__lead {
+  font-family: var(--font-sans-jp); font-size: 14px;
+  color: var(--ink-graphite); line-height: 1.9;
+  margin: 0 0 28px; max-width: 760px;
+}
+
+/* Flow diagram */
+.flow {
+  font-family: var(--font-mono); font-size: 12.5px; line-height: 1.85;
+  background: var(--paper-cream); border: 1px solid var(--rule-hairline);
+  padding: 24px 28px; white-space: pre; overflow-x: auto;
+  color: var(--ink-charcoal); margin: 16px 0;
+}
+.flow .phase {
+  color: var(--accent-gold); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+}
+.flow .arrow { color: var(--ink-soft); }
+.flow .key { color: var(--ink-black); font-weight: 700; }
+.flow .danger { color: #c8302e; font-weight: 700; }
+.flow .safe { color: #2e8b57; font-weight: 700; }
+.flow .note { color: var(--ink-soft); font-style: italic; }
+
+/* Editorial table */
+.t {
+  width: 100%; border-collapse: collapse;
+  font-family: var(--font-sans-jp); font-size: 13.5px;
+  margin: 16px 0;
+}
+.t tr { border-bottom: 1px solid var(--rule-hairline); }
+.t tr:first-child { border-top: 1px solid var(--ink-black); }
+.t th {
+  text-align: left; padding: 14px 16px 14px 0;
+  font-family: var(--font-sans-en); font-weight: 700; font-size: 11px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-grey); border-bottom: 1px solid var(--ink-black);
+}
+.t td {
+  padding: 14px 16px 14px 0; vertical-align: top;
+  color: var(--ink-charcoal); line-height: 1.7;
+}
+.t td:first-child {
+  font-weight: 700; color: var(--ink-black); width: 32%;
+}
+.t td.danger { color: #c8302e; font-weight: 700; }
+.t td.safe { color: #2e8b57; font-weight: 700; }
+.t code {
+  font-family: var(--font-mono); font-size: 12px;
+  background: var(--paper-cream); padding: 1px 6px;
+  border: 1px solid var(--rule-hairline);
+}
+
+/* Strength comparison */
+.strength {
+  display: grid; gap: 0;
+  border-top: 1px solid var(--ink-black);
+  border-bottom: 1px solid var(--ink-black);
+  margin: 16px 0;
+}
+.strength__row {
+  display: grid;
+  grid-template-columns: 160px 1fr 200px;
+  border-bottom: 1px solid var(--rule-hairline);
+  padding: 14px 0;
+}
+.strength__row:last-child { border-bottom: none; }
+.strength__row.head {
+  border-bottom: 1px solid var(--ink-black);
+  font-family: var(--font-sans-en); font-weight: 700; font-size: 11px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-grey); padding: 12px 0;
+}
+.strength__type {
+  font-family: var(--font-sans-jp); font-weight: 700; font-size: 14px;
+  color: var(--ink-black);
+}
+.strength__type code {
+  font-family: var(--font-mono); font-size: 12px;
+  background: var(--paper-cream); padding: 1px 6px;
+  border: 1px solid var(--rule-hairline);
+  margin-left: 8px; font-weight: 400;
+}
+.strength__bar-wrap {
+  height: 14px; background: var(--paper-cream);
+  border: 1px solid var(--rule-hairline); margin: 4px 16px 4px 0;
+  position: relative;
+}
+.strength__bar {
+  height: 100%; background: var(--accent-gold);
+}
+.strength__bar.danger { background: #c8302e; }
+.strength__bar.safe { background: #2e8b57; }
+.strength__time {
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--ink-charcoal); align-self: center;
+}
+.strength__time.danger { color: #c8302e; font-weight: 700; }
+.strength__time.safe { color: #2e8b57; font-weight: 700; }
+
+/* Note callout */
+.note {
+  border-left: 3px solid var(--accent-gold);
+  background: var(--paper-cream);
+  padding: 14px 18px; margin: 16px 0;
+  font-family: var(--font-sans-jp); font-size: 13px;
+  color: var(--ink-charcoal); line-height: 1.85;
+}
+.note--warn { border-left-color: #c8302e; }
+.note__label {
+  font-family: var(--font-sans-en); font-weight: 900; font-size: 10px;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--accent-gold); margin-right: 8px;
+}
+.note--warn .note__label { color: #c8302e; }
+
+/* Related */
+.related { display: grid; gap: 8px; margin: 12px 0; }
+.related a {
+  font-family: var(--font-sans-jp); font-size: 13px;
+  color: var(--ink-graphite); text-decoration: none;
+  border-bottom: 1px solid var(--rule-hairline); padding: 8px 0;
+}
+.related a:hover { color: var(--ink-black); border-bottom-color: var(--accent-gold); }
+.related a .arrow { color: var(--accent-gold); margin-right: 8px; font-family: var(--font-sans-en); }
+
+/* Footer */
+.p-footer {
+  padding: 40px 0 60px; font-family: var(--font-sans-en);
+  font-size: 11px; letter-spacing: 0.1em;
+  color: var(--ink-soft); text-transform: uppercase;
+}
+.p-footer .slash { color: var(--accent-gold); }
+
+@media (max-width: 640px) {
+  .strength__row { grid-template-columns: 1fr; gap: 4px; }
+  .strength__bar-wrap { margin: 4px 0; }
+  .flow { font-size: 11.5px; padding: 16px 18px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="top-nav__inner">
+    <a href="index.html" class="top-nav__brand">V<span class="slash">/</span>ENTER WEB</a>
+    <a href="index.html" class="top-nav__back">← Home</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- HERO -->
+<section class="p-hero">
+  <div class="p-hero__eyebrow">Mechanism · How It Works</div>
+  <h1 class="p-hero__title">How<br>staticrypt<br><span class="accent">Works.</span></h1>
+  <p class="p-hero__subtitle">GitHub Pages × クライアント側AES復号</p>
+  <p class="p-hero__lead">
+    デモサイトのパスワード保護で使っている <strong>staticrypt</strong> が内部で何をしているか。
+    なぜサーバーが要らないのか、なぜパスワードの長さがそのまま暗号強度になるのかを1ページにまとめた。
+  </p>
+  <div class="p-hero__meta">Updated · 2026-05-10 / VAIZO V/ENTER WEB</div>
+</section>
+
+<!-- TL;DR -->
+<section class="tldr">
+  <div class="tldr__inner">
+    <div class="tldr__eyebrow">結論 · TL;DR</div>
+    <h2 class="tldr__heading">パスワード認証も復号も、すべて<strong>ブラウザのJavaScript</strong>で完結している。</h2>
+    <ul class="tldr__bullets">
+      <li>サーバー側認証は<strong>無し</strong>（GitHub Pagesは静的配信のみ）</li>
+      <li>暗号化済HTMLは<strong>誰でもダウンロード可能</strong>（URLを知っていれば）</li>
+      <li>復号は<strong>100%ブラウザJS</strong>でAES-256（CryptoJS / Web Crypto API）</li>
+      <li>レート制限<strong>不可能</strong> → 攻撃者は手元でJSを動かして総当たりできる</li>
+      <li>つまり<strong>パスワードの長さ＝暗号強度</strong>になる</li>
+    </ul>
+  </div>
+</section>
+
+<!-- §01 全体フロー -->
+<section class="p-section">
+  <div class="p-section__num">01 / Flow</div>
+  <h2 class="p-section__title">全体フロー <span class="jp">ビルドからアクセスまで</span></h2>
+  <p class="p-section__lead">
+    ビルド時にHTML本文を暗号化して保存し、ブラウザでJSが復号する2フェーズ構成。
+    通常のWebサーバーでは「サーバーがPW検証→正しければHTMLを返す」だが、
+    staticryptは「あらかじめ暗号化したHTMLを誰にでも返す→ブラウザが復号する」というモデル。
+  </p>
+
+<div class="flow"><span class="phase">[ Build Time · ビルド時（GitHub Actions上）]</span>
+
+  元のHTML  +  パスワード（12文字以上）
+       <span class="arrow">|</span>
+       <span class="arrow">v</span>  AES-256 暗号化（PBKDF2 で鍵導出）
+       <span class="arrow">|</span>
+       <span class="arrow">v</span>
+  <span class="key">出力されるHTML（1ファイル）の中身：</span>
+    <span class="arrow">├─</span> 暗号化された元HTML（Base64）
+    <span class="arrow">├─</span> staticrypt の復号用JS（数KB）
+    <span class="arrow">├─</span> パスワード入力フォーム
+    <span class="arrow">└─</span> HMAC（PW正誤の検証用ハッシュ）
+       <span class="arrow">|</span>
+       <span class="arrow">v</span>  GitHub Pages の Public repo に push
+
+<span class="phase">[ Distribution · 配信（GitHub Pages）]</span>
+
+  https://enter-web.github.io/{案件}-demo/   <span class="note">← 誰でもアクセス可</span>
+       <span class="arrow">|</span>
+       <span class="arrow">v</span>  暗号化済HTML（≒ ランダムなBase64文字列）が返る
+       <span class="arrow">|</span>
+       <span class="arrow">v</span>  攻撃者がここでDLしても、中身は意味不明（暗号化済）
+
+<span class="phase">[ Access Time · アクセス時（クライアントのブラウザ）]</span>
+
+  1. ブラウザが上記HTMLをロード
+  2. パスワード入力フォームが表示される
+  3. ユーザーがPWを入力
+       <span class="arrow">|</span>
+       <span class="arrow">v</span>
+  4. JSが PW から PBKDF2 で鍵を再生成
+  5. JSが その鍵で暗号文をAES復号
+  6. <span class="key">HMAC で検証</span>
+       <span class="arrow">|</span>
+       ┌─ <span class="safe">OK</span> → 復号できた元HTMLを画面に描画 → 閲覧開始
+       └─ <span class="danger">NG</span> → "Bad password" を表示</div>
+</section>
+
+<!-- §02 重要なポイント -->
+<section class="p-section">
+  <div class="p-section__num">02 / Key Points</div>
+  <h2 class="p-section__title">重要ポイント <span class="jp">勘違いしやすいところ</span></h2>
+  <table class="t">
+    <tr><th>項目</th><th>実際の挙動</th></tr>
+    <tr><td>サーバー側認証</td><td class="danger">無し（GitHub Pagesは静的配信のみ）</td></tr>
+    <tr><td>暗号化済バンドル</td><td>URLを知っていれば誰でもダウンロード可能（ファイル単独で完結）</td></tr>
+    <tr><td>復号処理</td><td>100% ブラウザのJavaScript（CryptoJS or Web Crypto API）</td></tr>
+    <tr><td>復号アルゴリズム</td><td>AES-256-CBC（PBKDF2で鍵導出、HMACで検証）</td></tr>
+    <tr><td>パスワード入力リトライ制限</td><td class="danger">無し（クライアント側なので技術的に不可能）</td></tr>
+    <tr><td>サーバーログ</td><td class="danger">無し（誰がいつ閲覧したか記録できない）</td></tr>
+    <tr><td>オフライン総当たり攻撃</td><td class="danger">可能（攻撃者がHTMLを保存して手元のスクリプトで試行）</td></tr>
+    <tr><td>暗号強度</td><td>事実上、<strong>PWのエントロピーがそのまま暗号強度</strong></td></tr>
+    <tr><td>復号後のHTML</td><td>DOMに直接挿入（メモリ上のみ・ファイルには残らない）</td></tr>
+    <tr><td>localStorage 保存</td><td>オプション。「次回以降PW入力をスキップ」したいときのみ有効化</td></tr>
+  </table>
+
+  <div class="note note--warn">
+    <span class="note__label">見落としやすい注意</span>
+    クライアントが <strong>F12でDevToolsを開けば</strong> 暗号化済バンドルの構造を見られます。中身は復号できなくても、「このサイトは staticrypt で守られている」「使われているライブラリのバージョン」などは丸見え。あくまで「コンテンツの秘匿」が目的で「存在の秘匿」ではないことに注意。
+  </div>
+</section>
+
+<!-- §03 PW長と暗号強度 -->
+<section class="p-section">
+  <div class="p-section__num">03 / Strength</div>
+  <h2 class="p-section__title">なぜ12文字以上が必須か <span class="jp">PW長 = 暗号強度</span></h2>
+  <p class="p-section__lead">
+    オフライン総当たり攻撃を前提とすると、PWの組み合わせ数がそのまま破られるまでの時間になる。
+    一般的な攻撃マシン（GPU 1枚、毎秒10億回試行）を想定した試算。
+  </p>
+
+  <div class="strength">
+    <div class="strength__row head">
+      <div>パスワード</div>
+      <div>強度（相対）</div>
+      <div>破られるまでの時間</div>
+    </div>
+
+    <div class="strength__row">
+      <div class="strength__type">4桁数字 <code>1234</code></div>
+      <div><div class="strength__bar-wrap"><div class="strength__bar danger" style="width:0.5%;"></div></div></div>
+      <div class="strength__time danger">約 0.00001 秒</div>
+    </div>
+
+    <div class="strength__row">
+      <div class="strength__type">6桁数字 <code>123456</code></div>
+      <div><div class="strength__bar-wrap"><div class="strength__bar danger" style="width:1%;"></div></div></div>
+      <div class="strength__time danger">約 0.001 秒</div>
+    </div>
+
+    <div class="strength__row">
+      <div class="strength__type">8文字英数字 <code>aB3xY7pK</code></div>
+      <div><div class="strength__bar-wrap"><div class="strength__bar danger" style="width:8%;"></div></div></div>
+      <div class="strength__time danger">約 3 分</div>
+    </div>
+
+    <div class="strength__row">
+      <div class="strength__type">10文字英数字</div>
+      <div><div class="strength__bar-wrap"><div class="strength__bar" style="width:25%;"></div></div></div>
+      <div class="strength__time">約 7 日</div>
+    </div>
+
+    <div class="strength__row">
+      <div class="strength__type"><strong>12文字英数字</strong>（VAIZO 標準）</div>
+      <div><div class="strength__bar-wrap"><div class="strength__bar safe" style="width:60%;"></div></div></div>
+      <div class="strength__time safe">約 70 年</div>
+    </div>
+
+    <div class="strength__row">
+      <div class="strength__type">16文字英数字</div>
+      <div><div class="strength__bar-wrap"><div class="strength__bar safe" style="width:100%;"></div></div></div>
+      <div class="strength__time safe">約 1兆 年</div>
+    </div>
+  </div>
+
+  <div class="note">
+    <span class="note__label">VAIZO 基準</span>
+    <strong>12文字 = 約70年の総当たり耐性</strong> をクライアント確認用デモの最低基準としている。
+    案件期間（数週間〜2ヶ月）に対して十分な強度差。
+    16文字以上は「機密情報を含むデモ」「VIP案件」で推奨。
+  </div>
+
+  <div class="note note--warn">
+    <span class="note__label">参考：他方式との比較</span>
+    Cloudflare Access や Vercel Password Protection は<strong>サーバー側認証</strong>のため、入力リトライにレート制限がかかる（5回失敗で1時間ロック等）。
+    つまり「短いPWでも一定の安全性」が得られる。
+    一方 staticrypt は<strong>レート制限不可能</strong>なので、PW長さで殴り勝つしかない。これがstaticrypt運用の最大の制約。
+  </div>
+</section>
+
+<!-- 関連 -->
+<section class="p-section">
+  <div class="p-section__num">— / Related</div>
+  <h2 class="p-section__title">関連ドキュメント</h2>
+  <div class="related">
+    <a href="demo-password-protect.html"><span class="arrow">→</span>デモサイトのパスワード保護（手順マニュアル）</a>
+    <a href="https://github.com/robinmoisson/staticrypt" target="_blank" rel="noopener"><span class="arrow">→</span>staticrypt 公式リポジトリ（外部）</a>
+    <a href="index.html"><span class="arrow">→</span>マニュアル一覧に戻る</a>
+  </div>
+</section>
+
+<footer class="p-footer">
+  V<span class="slash">/</span>ENTER WEB · 2026
+</footer>
+
+</main>
+
+</body>
+</html>
