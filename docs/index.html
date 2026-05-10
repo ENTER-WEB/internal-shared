@@ -4,67 +4,380 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ENTER WEB 社内共通マニュアル</title>
-<meta name="description" content="ENTER WEB事業部の社内共通マニュアル一覧。">
+<meta name="description" content="ENTER WEB事業部の社内共通マニュアル一覧。新規追加はClaude Codeにプロンプト1行を貼るだけ。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+JP:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+JP:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/vaizo-editorial.css">
 <style>
 body { background: var(--paper-off-white); }
 main { max-width: var(--max-w-page); margin: 0 auto; padding: 0 clamp(24px, 4vw, 48px); }
-.hero { padding: clamp(64px, 10vw, 120px) 0 clamp(32px, 5vw, 56px); border-bottom: 1px solid var(--rule-hairline); }
-.hero__eyebrow { font-family: var(--font-sans-en); font-weight: 700; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-grey); margin-bottom: 14px; }
-.hero__title { font-family: var(--font-sans-en); font-weight: 900; font-size: clamp(48px, 7vw, 96px); letter-spacing: 0.02em; line-height: 1; margin: 0 0 16px; color: var(--ink-black); }
+
+/* HERO = 結論先 */
+.hero {
+  padding: clamp(48px, 8vw, 96px) 0 clamp(32px, 5vw, 56px);
+  border-bottom: 1px solid var(--rule-hairline);
+}
+.hero__eyebrow {
+  font-family: var(--font-sans-en);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-grey);
+  margin-bottom: 14px;
+}
+.hero__title {
+  font-family: var(--font-sans-en);
+  font-weight: 900;
+  font-size: clamp(40px, 6vw, 80px);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  margin: 0 0 12px;
+  color: var(--ink-black);
+}
 .hero__title .accent { color: var(--accent-gold); }
-.hero__sub { font-family: var(--font-sans-jp); font-weight: 700; font-size: clamp(16px, 1.6vw, 20px); color: var(--ink-charcoal); margin: 0 0 8px; }
-.hero__lead { font-family: var(--font-sans-jp); font-size: 14px; color: var(--ink-graphite); line-height: 1.9; max-width: 720px; margin: 0; }
+.hero__sub {
+  font-family: var(--font-sans-jp);
+  font-weight: 700;
+  font-size: clamp(15px, 1.4vw, 18px);
+  color: var(--ink-charcoal);
+  margin: 0;
+}
+
+/* PROMPT BOX = 主役 */
+.prompt-section {
+  padding: clamp(32px, 5vw, 56px) 0 clamp(40px, 6vw, 72px);
+  border-bottom: 1px solid var(--rule-hairline);
+}
+.prompt-section__label {
+  font-family: var(--font-sans-en);
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  margin: 0 0 12px;
+}
+.prompt-section__hint {
+  font-family: var(--font-sans-jp);
+  font-weight: 700;
+  font-size: clamp(20px, 2.4vw, 28px);
+  color: var(--ink-black);
+  line-height: 1.5;
+  margin: 0 0 24px;
+  letter-spacing: 0.02em;
+}
+.prompt-section__hint .small {
+  display: block;
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--ink-grey);
+  margin-top: 8px;
+  letter-spacing: 0;
+}
+
+.prompt-box {
+  position: relative;
+  background: #0a0a0a;
+  color: #f5f3ee;
+  border: 1px solid var(--ink-black);
+  margin: 0 0 16px;
+  font-family: var(--font-mono);
+  overflow: hidden;
+}
+.prompt-box__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px;
+  background: #1c1c1c;
+  border-bottom: 1px solid #333;
+  font-family: var(--font-sans-en);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #8a8a8a;
+}
+.prompt-box__head .label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.prompt-box__head .label::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+}
+.prompt-box__copy {
+  background: var(--accent-gold);
+  border: 1px solid var(--accent-gold);
+  color: #0a0a0a;
+  font-family: var(--font-sans-en);
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.prompt-box__copy:hover {
+  background: #f5f3ee;
+  color: #0a0a0a;
+}
+.prompt-box__copy.is-copied {
+  background: #f5f3ee;
+  color: #0a0a0a;
+}
+.prompt-box pre {
+  margin: 0;
+  padding: clamp(20px, 3vw, 32px) clamp(20px, 3vw, 32px);
+  font-family: var(--font-mono);
+  font-size: clamp(14px, 1.6vw, 18px);
+  line-height: 1.7;
+  color: #f5f3ee;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.prompt-box__caption {
+  font-family: var(--font-sans-jp);
+  font-size: 12.5px;
+  color: var(--ink-graphite);
+  line-height: 1.85;
+  margin: 0 0 8px;
+}
+.prompt-box__caption strong {
+  color: var(--ink-black);
+  font-weight: 700;
+}
+
+/* WHAT HAPPENS = 内訳（折りたたみ） */
+.what-happens {
+  margin-top: 24px;
+}
+.what-happens summary {
+  list-style: none;
+  cursor: pointer;
+  font-family: var(--font-sans-jp);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink-graphite);
+  padding: 12px 0 12px 28px;
+  position: relative;
+  border-top: 1px solid var(--rule-hairline);
+  border-bottom: 1px solid var(--rule-hairline);
+  transition: color 0.15s;
+}
+.what-happens summary::-webkit-details-marker { display: none; }
+.what-happens summary::before {
+  content: '+';
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-sans-en);
+  font-weight: 900;
+  font-size: 18px;
+  color: var(--accent-gold);
+  width: 18px;
+  text-align: center;
+}
+.what-happens[open] summary::before { content: '−'; }
+.what-happens summary:hover { color: var(--ink-black); }
+.what-happens__body {
+  padding: 16px 0 8px 28px;
+  font-family: var(--font-sans-jp);
+  font-size: 13px;
+  color: var(--ink-graphite);
+  line-height: 1.85;
+}
+.what-happens__body ol {
+  margin: 0;
+  padding-left: 22px;
+}
+.what-happens__body li { margin-bottom: 6px; }
+.what-happens__body li strong { color: var(--ink-black); }
+
+/* LIBRARY */
 .list { padding: clamp(40px, 6vw, 64px) 0; }
-.list__title { font-family: var(--font-sans-en); font-weight: 900; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent-gold); margin: 0 0 24px; }
-.m-card { display: block; padding: 24px 28px; border: 1px solid var(--rule-hairline); border-left: 3px solid var(--accent-gold); background: var(--paper-pure); margin-bottom: 12px; text-decoration: none; transition: background 0.15s, border-color 0.15s; }
-.m-card:hover { background: var(--paper-cream); border-left-color: var(--ink-black); }
-.m-card__title { font-family: var(--font-sans-jp); font-weight: 700; font-size: 16px; color: var(--ink-black); margin: 0 0 6px; }
-.m-card__title .arrow { color: var(--accent-gold); margin-right: 10px; }
-.m-card__desc { font-family: var(--font-sans-jp); font-size: 13px; color: var(--ink-graphite); line-height: 1.8; margin: 0; }
-.m-card__meta { font-family: var(--font-sans-en); font-size: 10px; letter-spacing: 0.12em; color: var(--ink-soft); text-transform: uppercase; margin-top: 8px; }
-.howto-prompt { margin-top: 40px; padding: 20px 24px; border: 1px solid var(--ink-black); background: var(--paper-cream); }
-.howto-prompt__label { font-family: var(--font-sans-en); font-weight: 900; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent-gold); margin: 0 0 8px; }
-.howto-prompt__text { font-family: var(--font-mono); font-size: 14px; color: var(--ink-black); margin: 0 0 8px; padding: 12px 16px; background: var(--paper-pure); border: 1px solid var(--rule-hairline); }
-.howto-prompt__caption { font-family: var(--font-sans-jp); font-size: 12px; color: var(--ink-graphite); margin: 0; line-height: 1.7; }
-footer { padding: 40px 0 60px; font-family: var(--font-sans-en); font-size: 11px; letter-spacing: 0.1em; color: var(--ink-soft); text-transform: uppercase; }
+.list__title {
+  font-family: var(--font-sans-en);
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  margin: 0 0 8px;
+}
+.list__lead {
+  font-family: var(--font-sans-jp);
+  font-size: 13px;
+  color: var(--ink-graphite);
+  margin: 0 0 24px;
+}
+.m-card {
+  display: block;
+  padding: 24px 28px;
+  border: 1px solid var(--rule-hairline);
+  border-left: 3px solid var(--accent-gold);
+  background: var(--paper-pure);
+  margin-bottom: 12px;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+.m-card:hover {
+  background: var(--paper-cream);
+  border-left-color: var(--ink-black);
+}
+.m-card__title {
+  font-family: var(--font-sans-jp);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--ink-black);
+  margin: 0 0 6px;
+}
+.m-card__title .arrow {
+  color: var(--accent-gold);
+  margin-right: 10px;
+}
+.m-card__desc {
+  font-family: var(--font-sans-jp);
+  font-size: 13px;
+  color: var(--ink-graphite);
+  line-height: 1.8;
+  margin: 0;
+}
+.m-card__meta {
+  font-family: var(--font-sans-en);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+footer {
+  padding: 32px 0 60px;
+  font-family: var(--font-sans-en);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
 footer .slash { color: var(--accent-gold); }
+
+@media (max-width: 640px) {
+  .prompt-box pre { font-size: 13px; padding: 18px; }
+  .prompt-box__head { padding: 10px 14px; }
+  .prompt-box__copy { padding: 6px 12px; font-size: 10px; }
+}
 </style>
 </head>
 <body>
 <main>
 
+<!-- ============================================================
+     HERO
+     ============================================================ -->
 <section class="hero">
   <div class="hero__eyebrow">ENTER WEB · Internal Shared</div>
   <h1 class="hero__title">Manuals<span class="accent">.</span></h1>
   <p class="hero__sub">ENTER WEB 事業部 社内共通マニュアル</p>
-  <p class="hero__lead">
-    手順・運用ルール・テンプレートを HTML（コピーボタン付き）と PDF の両方で配布。
-    新規追加・更新は Claude Code に「<code>internal-shared に○○のマニュアルを追加して</code>」と言うだけで完了します。
-  </p>
 </section>
 
+<!-- ============================================================
+     結論先：これを Claude Code に貼るだけ
+     ============================================================ -->
+<section class="prompt-section">
+  <div class="prompt-section__label">How to Add a Manual</div>
+  <h2 class="prompt-section__hint">
+    Claude Code にこれを貼るだけ。
+    <span class="small">○○○ をマニュアルのテーマに置き換えてください。それ以外の操作は不要です。</span>
+  </h2>
+
+  <div class="prompt-box">
+    <div class="prompt-box__head">
+      <span class="label">Claude Code Prompt</span>
+      <button class="prompt-box__copy" type="button" id="copyPrompt">Copy</button>
+    </div>
+<pre id="promptText">ENTER-WEB/internal-shared に「○○○のマニュアル」を追加して</pre>
+  </div>
+
+  <p class="prompt-box__caption">
+    <strong>これだけで全部終わります。</strong>
+    Claude が自動で HTML を生成し、PDF を作り、GitHub に push、Drive にアップロードまで完了させます。
+    手動の操作・確認・コピペは一切不要。
+  </p>
+
+  <details class="what-happens">
+    <summary>裏で実行される内容（クリックで詳細）</summary>
+    <div class="what-happens__body">
+      <ol>
+        <li><strong>ヒアリング</strong>：テーマ・元ネタ・コピペ対象を確認</li>
+        <li><strong>HTML生成</strong>：VAIZO Editorial 流儀＋コピーボタン＋隠しトグル付きで作成</li>
+        <li><strong>PDF生成</strong>：Playwright で A4・隠しトグル全展開・配布用に出力</li>
+        <li><strong>GitHub push</strong>：ENTER-WEB/internal-shared の <code>docs/</code> と <code>pdf/</code> に配置・commit・push</li>
+        <li><strong>Drive アップロード</strong>：ENTER WEB フォルダに同一PDFを配置</li>
+        <li><strong>報告</strong>：GitHub Pages 公開URLと Drive PDF URL を返答</li>
+      </ol>
+    </div>
+  </details>
+</section>
+
+<!-- ============================================================
+     収録マニュアル
+     ============================================================ -->
 <section class="list">
   <h2 class="list__title">Library</h2>
+  <p class="list__lead">公開済みマニュアル一覧。クリックで開きます。</p>
 
   <a class="m-card" href="demo-password-protect.html">
     <h3 class="m-card__title"><span class="arrow">→</span>デモサイトのパスワード保護</h3>
     <p class="m-card__desc">GitHub Pages + staticrypt + GH Actions の標準フロー。1Password の使い方を隠しトグルで集約。コマンド・workflow.yml・メール本文はコピーボタンでワンクリック取得可。</p>
     <div class="m-card__meta">v1.0 · 2026-05-10</div>
   </a>
-
-  <div class="howto-prompt">
-    <div class="howto-prompt__label">Add a New Manual</div>
-    <p class="howto-prompt__text">ENTER-WEB/internal-shared に「○○○のマニュアル」を追加して</p>
-    <p class="howto-prompt__caption">↑ Claude Code にこのテンプレートで指示するだけ。HTML生成・PDF生成・GitHub push・Drive アップロードまで全部自動。</p>
-  </div>
 </section>
 
 <footer>ENTER<span class="slash">/</span>WEB · 2026</footer>
 
 </main>
+
+<script>
+(function () {
+  const btn = document.getElementById('copyPrompt');
+  const text = document.getElementById('promptText');
+  if (!btn || !text) return;
+  btn.addEventListener('click', function () {
+    const t = text.innerText;
+    const done = function () {
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      btn.classList.add('is-copied');
+      setTimeout(function () {
+        btn.textContent = original;
+        btn.classList.remove('is-copied');
+      }, 1500);
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(t).then(done).catch(fallback);
+    } else { fallback(); }
+    function fallback() {
+      const ta = document.createElement('textarea');
+      ta.value = t;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
