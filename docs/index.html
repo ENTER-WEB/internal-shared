@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ENTER WEB 社内共通マニュアル</title>
+<meta name="description" content="ENTER WEB事業部の社内共通マニュアル一覧。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+JP:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/vaizo-editorial.css">
+<style>
+body { background: var(--paper-off-white); }
+main { max-width: var(--max-w-page); margin: 0 auto; padding: 0 clamp(24px, 4vw, 48px); }
+.hero { padding: clamp(64px, 10vw, 120px) 0 clamp(32px, 5vw, 56px); border-bottom: 1px solid var(--rule-hairline); }
+.hero__eyebrow { font-family: var(--font-sans-en); font-weight: 700; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-grey); margin-bottom: 14px; }
+.hero__title { font-family: var(--font-sans-en); font-weight: 900; font-size: clamp(48px, 7vw, 96px); letter-spacing: 0.02em; line-height: 1; margin: 0 0 16px; color: var(--ink-black); }
+.hero__title .accent { color: var(--accent-gold); }
+.hero__sub { font-family: var(--font-sans-jp); font-weight: 700; font-size: clamp(16px, 1.6vw, 20px); color: var(--ink-charcoal); margin: 0 0 8px; }
+.hero__lead { font-family: var(--font-sans-jp); font-size: 14px; color: var(--ink-graphite); line-height: 1.9; max-width: 720px; margin: 0; }
+.list { padding: clamp(40px, 6vw, 64px) 0; }
+.list__title { font-family: var(--font-sans-en); font-weight: 900; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent-gold); margin: 0 0 24px; }
+.m-card { display: block; padding: 24px 28px; border: 1px solid var(--rule-hairline); border-left: 3px solid var(--accent-gold); background: var(--paper-pure); margin-bottom: 12px; text-decoration: none; transition: background 0.15s, border-color 0.15s; }
+.m-card:hover { background: var(--paper-cream); border-left-color: var(--ink-black); }
+.m-card__title { font-family: var(--font-sans-jp); font-weight: 700; font-size: 16px; color: var(--ink-black); margin: 0 0 6px; }
+.m-card__title .arrow { color: var(--accent-gold); margin-right: 10px; }
+.m-card__desc { font-family: var(--font-sans-jp); font-size: 13px; color: var(--ink-graphite); line-height: 1.8; margin: 0; }
+.m-card__meta { font-family: var(--font-sans-en); font-size: 10px; letter-spacing: 0.12em; color: var(--ink-soft); text-transform: uppercase; margin-top: 8px; }
+.howto-prompt { margin-top: 40px; padding: 20px 24px; border: 1px solid var(--ink-black); background: var(--paper-cream); }
+.howto-prompt__label { font-family: var(--font-sans-en); font-weight: 900; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent-gold); margin: 0 0 8px; }
+.howto-prompt__text { font-family: var(--font-mono); font-size: 14px; color: var(--ink-black); margin: 0 0 8px; padding: 12px 16px; background: var(--paper-pure); border: 1px solid var(--rule-hairline); }
+.howto-prompt__caption { font-family: var(--font-sans-jp); font-size: 12px; color: var(--ink-graphite); margin: 0; line-height: 1.7; }
+footer { padding: 40px 0 60px; font-family: var(--font-sans-en); font-size: 11px; letter-spacing: 0.1em; color: var(--ink-soft); text-transform: uppercase; }
+footer .slash { color: var(--accent-gold); }
+</style>
+</head>
+<body>
+<main>
+
+<section class="hero">
+  <div class="hero__eyebrow">ENTER WEB · Internal Shared</div>
+  <h1 class="hero__title">Manuals<span class="accent">.</span></h1>
+  <p class="hero__sub">ENTER WEB 事業部 社内共通マニュアル</p>
+  <p class="hero__lead">
+    手順・運用ルール・テンプレートを HTML（コピーボタン付き）と PDF の両方で配布。
+    新規追加・更新は Claude Code に「<code>internal-shared に○○のマニュアルを追加して</code>」と言うだけで完了します。
+  </p>
+</section>
+
+<section class="list">
+  <h2 class="list__title">Library</h2>
+
+  <a class="m-card" href="demo-password-protect.html">
+    <h3 class="m-card__title"><span class="arrow">→</span>デモサイトのパスワード保護</h3>
+    <p class="m-card__desc">GitHub Pages + staticrypt + GH Actions の標準フロー。1Password の使い方を隠しトグルで集約。コマンド・workflow.yml・メール本文はコピーボタンでワンクリック取得可。</p>
+    <div class="m-card__meta">v1.0 · 2026-05-10</div>
+  </a>
+
+  <div class="howto-prompt">
+    <div class="howto-prompt__label">Add a New Manual</div>
+    <p class="howto-prompt__text">ENTER-WEB/internal-shared に「○○○のマニュアル」を追加して</p>
+    <p class="howto-prompt__caption">↑ Claude Code にこのテンプレートで指示するだけ。HTML生成・PDF生成・GitHub push・Drive アップロードまで全部自動。</p>
+  </div>
+</section>
+
+<footer>ENTER<span class="slash">/</span>WEB · 2026</footer>
+
+</main>
+</body>
+</html>
